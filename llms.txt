@@ -1,16 +1,11 @@
 # mutation-lite
 
-> Lightweight ast-based mutation testing for Python: seven operators, stable mutant ids, span-exact source edits and a pluggable test runner Python package `trysac-mutation-lite`, import name `mutation_lite`, MIT licensed,
-> Python >= 3.10, no runtime dependencies.
+Lightweight, deterministic AST-based mutation testing library for Python. No runtime dependencies. Python >= 3.10.
 
 ## Docs
 
-- [README](README.md): problem, install, usage example
-- [AGENTS](AGENTS.md): commands, folder map, conventions, limits
-- [Architecture](docs/ARCHITECTURE.md): shape of the package and its public API
-- [Testing](docs/TESTING.md): how to run and extend the tests
-
-## Optional
-
-- [Stack](docs/STACK.md): tools used and discarded
-- [Changelog](CHANGELOG.md): release history
+- [README](README.md): Quick start, API overview, and design philosophy.
+- [Architecture](docs/ARCHITECTURE.md): AST-based mutation logic and runner protocol.
+- [Testing](docs/TESTING.md): Coverage policies and test execution.
+- [Security](docs/SECURITY.md): Threat model and sandbox recommendations.
+- [Stack](docs/STACK.md): Technology decisions.

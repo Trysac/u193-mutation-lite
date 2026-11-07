@@ -2,18 +2,18 @@
 
 ## Threat model
 
-`trysac-mutation-lite` is a pure library without I/O. The main risks are:
+`mutation-lite` is a pure Python library. It does not perform I/O beyond temporary file management and subprocess invocation.
 
-- **Supply chain**: a compromised dependency or CI action. Mitigation: no runtime dependencies,
-  Dependabot weekly updates, actions pinned to major versions, minimal workflow permissions.
-- **Leaked secrets**: tokens committed by mistake. Mitigation: `gitleaks` runs in the local gates
-  and in CI; `.env` files are git-ignored.
-- **Untrusted input**: callers may pass hostile strings. Mitigation: validate input and fail with
-  explicit exceptions; never `eval`, `exec` or deserialize untrusted data.
+### Defended
+
+- **Untrusted Input**: The library relies on `ast.parse`. It does not use `eval()` or `exec()` on strings. Syntax errors are caught and raised as `MutationError('syntax_error', ...)`, ensuring bad code does not execute.
+- **Supply Chain**: The project has zero runtime dependencies. Dependabot is enabled for weekly updates, and CI workflows are pinned to major versions with minimal permissions.
+- **Leaked Secrets**: `gitleaks` is integrated into local gates and CI. `.env` files are ignored by git.
+
+### Not Defended
+
+- **Test Environment Security**: Since the library runs arbitrary test commands via `SubprocessRunner`, the execution environment is only as secure as the test command itself. Users should only run mutation tests in isolated containers or sandboxed environments.
 
 ## Publishing
 
-Releases are published to PyPI with trusted publishing (OIDC) when available, never with a
-long-lived token stored in the repository.
-
-To report a vulnerability, see [SECURITY.md](../SECURITY.md).
+Releases to PyPI utilize Trusted Publishing (OIDC). No long-lived credentials are stored in the repository.

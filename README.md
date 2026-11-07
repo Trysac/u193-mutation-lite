@@ -1,48 +1,41 @@
 # mutation-lite
 
-[![PyPI version](https://img.shields.io/pypi/v/trysac-mutation-lite)](https://pypi.org/project/trysac-mutation-lite/)
-[![License: MIT](https://img.shields.io/pypi/l/trysac-mutation-lite)](LICENSE)
-[![CI](https://github.com/Trysac/u193-mutation-lite/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u193-mutation-lite/actions/workflows/ci.yml)
-
-Lightweight ast-based mutation testing for Python: seven operators, stable mutant ids, span-exact source edits and a pluggable test runner
+Lightweight, deterministic AST-based mutation testing for Python. It provides seven operators, stable mutant identifiers, span-exact source edits, and a pluggable test runner.
 
 ## Problem
 
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and what
-they do today without it. Replace this paragraph when the first real feature lands.
+Line coverage only confirms code was executed, not that tests would detect logic errors within it. Existing mutation testing tools are often slow, configuration-heavy, and difficult to embed. Teams need a fast, reliable method to verify critical modules without the overhead of heavy external frameworks.
 
-## Install
+## Installation
 
-```sh
+```bash
 pip install trysac-mutation-lite
-# or
-uv add trysac-mutation-lite
 ```
-
-Requires Python 3.10 or newer. No runtime dependencies.
 
 ## Usage
 
 ```python
-import mutation_lite
+from mutation_lite import generate_mutants
 
-# normalize() trims surrounding whitespace and lower-cases the text.
-print(mutation_lite.normalize("  Hello World "))  # -> "hello world"
-
-# Blank input is rejected explicitly instead of returning an empty string.
-try:
-    mutation_lite.normalize("   ")
-except ValueError as exc:
-    print(f"rejected: {exc}")
+code = "def add(a, b):\n    return a + b\n"
+mutants = generate_mutants("math.py", code)
+for m in mutants:
+    print(m.id, m.mutated_source())
 ```
 
-## Documentation
+## API Summary
 
-- [Architecture](docs/ARCHITECTURE.md) and [decisions](docs/decisions/)
-- [Testing](docs/TESTING.md) and [security](docs/SECURITY.md)
-- [Project record](docs/PROJECT.md) and [stack](docs/STACK.md)
-- [Changelog](CHANGELOG.md) and [contributing guide](CONTRIBUTING.md)
+- **generate_mutants(path: str, source: str, *, operators=..., max_mutants=10000) -> list[Mutant]**: Generates stable, deterministic mutants.
+- **Mutant**: Frozen dataclass representing a code span mutation. Use `mutated_source()` to get the altered string.
+- **TestRunner**: Protocol for custom test execution. `SubprocessRunner` is provided as a default implementation.
+- **run_mutants(mutants, runner, *, on_event=None) -> Report**: Executes the test suite against generated mutants.
+- **Report**: Summary of outcomes (`killed`, `survived`, `timeout`, `error`).
+- **MutationError**: Raised for `syntax_error`, `too_many_mutants`, or `invalid_option`.
 
-## License
+## Why not <best-known alternative>?
 
-[MIT](LICENSE) (c) 2026 Miguel Gomez
+Unlike `mutmut`, `mutation-lite` is designed specifically as an embeddable library. It supports an injected runner interface, produces stable mutant IDs (deterministic based on `(line, col, operator, index)`), and handles UTF-8 source edits without external configuration.
+
+## Security
+
+See [docs/SECURITY.md](docs/SECURITY.md).

@@ -19,6 +19,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.scripts]
+mutation-lite = "mutation_lite.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/Trysac/u193-mutation-lite"
 Source = "https://github.com/Trysac/u193-mutation-lite"
