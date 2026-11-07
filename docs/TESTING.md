@@ -1,20 +1,22 @@
 # Testing
 
-## Running
+## Coverage Policy
+
+- Branch coverage must be at or above 80%. Failure to meet this threshold will block CI.
+- Tests must be deterministic: no network usage, no wall-clock dependencies, and no reliance on execution order.
+- Every bug fix must include a regression test that fails without the fix.
+
+## Test Structure
+
+Tests are located in `tests/` and mirror the package structure, primarily `test_mutation_lite.py`. They exercise:
+
+- The public API: `generate_mutants` and `run_mutants`.
+- Observable effects: return values, side effects, and exact exception handling.
+- Edge cases: tabs, CRLF, nested functions, and empty files.
+
+## Execution
 
 ```sh
-uv run pytest --cov=mutation_lite   # tests with coverage report
-uv run python scripts/check.py      # every gate, as CI and the factory run it
+uv run pytest --cov=mutation_lite
+uv run python scripts/check.py
 ```
-
-## Policy
-
-- Branch coverage of `src/mutation_lite` must stay at or above 80 %; the gate fails below it.
-- Tests exercise the public API (`import mutation_lite`) and assert every observable effect:
-  return values, raised exceptions and their messages.
-- Each bug fix starts with a failing test that reproduces it.
-- Tests are deterministic: no network, no wall clock, no dependence on test order.
-
-## Layout
-
-`tests/test_<module>.py` mirrors each public module. Shared fixtures go in `tests/conftest.py`.

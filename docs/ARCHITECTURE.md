@@ -1,29 +1,16 @@
 # Architecture
 
-## Purpose
+`mutation-lite` is a pure Python library designed for embeddability, relying only on the standard library (`ast`, `subprocess`, `tempfile`).
 
-`trysac-mutation-lite` is a small, dependency-free Python library: Lightweight ast-based mutation testing for Python: seven operators, stable mutant ids, span-exact source edits and a pluggable test runner
+## Components
 
-## Shape
-
-```text
-caller code --> mutation_lite (public API in __init__.py)
-                    |
-                    +-- pure functions, no I/O, no global state
-```
-
-- **Public API**: the names listed in `__all__` of `src/mutation_lite/__init__.py`. Anything else is
-  internal and may change without a major version.
-- **Errors**: invalid input raises built-in exceptions (`ValueError`, `TypeError`) with a clear
-  message; the library never prints or exits.
-- **Side effects**: none. If a feature needs I/O, isolate it in its own module behind a small
-  interface and record the choice in an ADR.
-
-## Quality contract
-
-`scripts/check.py` is the single definition of the gates; `fabrica.json` tells the factory and CI
-how to run it. See [TESTING.md](TESTING.md).
-
-## Decisions
-
-Architecture decisions are recorded in [decisions/](decisions/) as numbered ADRs.
+- **Mutant Generator**: Uses the standard `ast` module to analyze code. It converts character positions to span-exact byte offsets to correctly mutate multi-byte character sources. It skips docstrings, type annotations, decorators, f-string internals, and lines containing `# pragma: no mutate`.
+- **Operator Suite**: Implements seven operators:
+  - **AOR**: BinOp swap (+/-, */%, etc.).
+  - **ROR**: Comparison swap (<, <=, >, >=, ==, !=, is/is not, in/not in).
+  - **LCR**: Logical swap (and/or).
+  - **UOI**: Unary operator removal (not).
+  - **CRP**: Constant replacement (int n+1, bool flip, float +1.0).
+  - **RET**: Replace `return <expr>` with `return None`.
+  - **SDL**: Remove expression statement calls with `pass`.
+- **Execution Engine**: The `run_mutants` function consumes a `TestRunner` protocol implementation. The `SubprocessRunner` creates a temporary directory, copies the target root, applies the mutation to the specific file, and runs a provided command line.
