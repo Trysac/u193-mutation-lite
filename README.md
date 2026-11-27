@@ -8,8 +8,10 @@ Line coverage only confirms code was executed, not that tests would detect logic
 
 ## Installation
 
+Not published to PyPI yet. Install it from GitHub:
+
 ```bash
-pip install trysac-mutation-lite
+pip install "git+https://github.com/Trysac/u193-mutation-lite"
 ```
 
 ## Usage
